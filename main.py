@@ -14,7 +14,7 @@ args = easydict.EasyDict({
     # Train policy
     "numEpoch" : 1000,
     "batchSize" : 10,
-    "lr" : 1e-4,
+    "lr" : 1e-3,
     "manualSeed" : 1,
 
     # Record
