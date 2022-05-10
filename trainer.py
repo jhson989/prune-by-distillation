@@ -19,14 +19,17 @@ class Trainer:
         self.evalDataLoader = getDataLoader(train=False, args=args)
 
         # Model
-        self.teacher = getPretrainedModel(pretrained=True)
-        self.student = getPretrainedModel(pretrained=False)
+        self.teacher = getPretrainedModel(pretrained=True).to(self.args.device)
+        for param in self.teacher.parameters():
+            param.requires_grad = False
         self.teacher.eval()
+        self.student = getPretrainedModel(pretrained=False).to(self.args.device)
+        
 
         # Criterion
         self.optimizer = optim.Adam(self.student.parameters(), lr=self.args.lr)
         self.critTeacher = nn.MSELoss().to(self.args.device)
-        self.critGT = nn.CrossEntropyLoss().to(self.args.device)
+        self.critGT = nn.MSELoss().to(self.args.device)
 
         # Save
         self.bestLoss = 10.0
@@ -50,10 +53,10 @@ class Trainer:
 
                 ### learning
                 self.optimizer.zero_grad()
-                predTeacher = self.teacher(img)
-                pred = self.student(img)
+                predTeacher = self.teacher(img)['out']
+                pred = self.student(img)['out']
                 lossTeacher = self.critTeacher(pred, predTeacher)
-                lossGT = self.critGT(pred, gt)
+                lossGT = 0#self.critGT(pred.argmax(dim=1), gt)
                 loss = lossTeacher + lossGT
                 loss.backward()
                 self.optimizer.step()
@@ -62,7 +65,7 @@ class Trainer:
                 if idx % self.args.logFreq == 0 and idx != 0: 
                     self.logger.log(
                         "[[%4d/%4d] [%4d/%4d]] loss : Total(%.3f) = Teacher(%.3f) + GT(%.3f)"  
-                        % (epoch, self.args.numEpoch, idx, len(self.dataLoader), loss.item(), lossTeacher.item(), lossGT.item() )
+                        % (epoch, self.args.numEpoch, idx, len(self.dataLoader), loss.item(), lossTeacher.item(), 0 )
                     )
 
             ### Eval

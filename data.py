@@ -5,9 +5,14 @@ from torchvision import datasets, transforms
 def getDataLoader(train, args):
 
     ### Define data transform
-    trsform = transforms.Compose([
+    inputTrsform = transforms.Compose([
+        transforms.Resize((520, 480)),
         transforms.ToTensor(), 
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
+    outputTrsform = transforms.Compose([
+        transforms.Resize((520, 480)),
+        transforms.ToTensor()
     ])
 
     ### Training dataset
@@ -15,8 +20,9 @@ def getDataLoader(train, args):
         trainDataset = datasets.VOCSegmentation(
             "./data/train",
             image_set="train",
-            download=True,
-            transform=trsform
+            download=False,
+            transform=inputTrsform,
+            target_transform=outputTrsform
         )
 
         return torch.utils.data.DataLoader(
@@ -32,8 +38,9 @@ def getDataLoader(train, args):
         testDataset = datasets.VOCSegmentation(
             "./data/eval",
             image_set="val",
-            download=True,
-            transform=trsform
+            download=False,
+            transform=inputTrsform,
+            target_transform=outputTrsform
         )
 
         return torch.utils.data.DataLoader(
