@@ -13,14 +13,14 @@ args = easydict.EasyDict({
     
     # Train policy
     "numEpoch" : 1000,
-    "batchSize" : 10,
+    "batchSize" : 16,
     "lr" : 1e-3,
     "manualSeed" : 1,
 
     # Record
-    "savePath" : "./result/unpruned/",
+    "savePath" : "./result/pruned/",
     "retrain" : False, 
-    "loadPath" : "./result/unpruned/best.pth",
+    "loadPath" : "./result/pruned/best.pth",
     "logFreq" : 5,   
 
     # Hardware
